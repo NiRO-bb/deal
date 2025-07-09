@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @SpringBootTest
 @ExtendWith(DatabaseSetup.class)
-public class DealServiceTest  extends DealApplicationTests {
+public class DealServiceTest {
 
     private static UUID dealId;
 
