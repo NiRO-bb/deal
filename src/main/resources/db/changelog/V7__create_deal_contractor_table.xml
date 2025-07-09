@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="20250705-7" author="niro_bb">
+        <sql>
+            create table deal_contractor (
+            id uuid primary key not null,
+            deal_id uuid references deal (id) not null,
+            contractor_id varchar(12) not null,
+            name text not null,
+            inn text,
+            main boolean not null default false,
+            create_date timestamp not null default now(),
+            modify_date timestamp,
+            create_user_id text,
+            modify_user_id text,
+            is_active boolean not null default true
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>
