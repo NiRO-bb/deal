@@ -21,15 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Handles incoming http-requests at URL '/deal'
@@ -160,37 +154,15 @@ public class DealController {
      * (could not write .xlsx file, could not create .zip archive)
      */
     @PostMapping("/search/export")
-    public ResponseEntity<?> export(@RequestBody DealSearch dealSearch) throws IOException {
-        Optional<File> optFile = service.export(dealSearch);
-        if (optFile.isPresent()) {
-            File file = optFile.get();
-            File tmpFile = new File("tmp_" + file.getName());
-
-            try (FileInputStream fileInputStream = new FileInputStream(file);
-                 FileOutputStream fileOutputStream = new FileOutputStream(tmpFile);
-                 ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
-
-                zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
-                byte[] buffer = new byte[1024];
-                int data;
-                while((data = fileInputStream.read(buffer)) > 0) {
-                    zipOutputStream.write(buffer, 0, data);
-                }
-                zipOutputStream.close();
-                InputStreamResource result = new InputStreamResource(new FileInputStream(tmpFile));
-                file.delete();
-                tmpFile.delete();
-                HttpHeaders headers = new HttpHeaders();
-                headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
-
-                LOGGER.info("Deal exported");
-                return new ResponseEntity<>(result, headers, HttpStatus.OK);
-            } catch (IOException exception) {
-                LOGGER.info("Deal not exported; Error occurred during .zip archive creating");
-                return new ResponseEntity<>("Deal exporting was failed", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    public ResponseEntity<?> export(@RequestBody DealSearch dealSearch) {
+        Optional<InputStreamResource> resource = service.export(dealSearch);
+        if (resource.isPresent()) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
+            LOGGER.info("Deal exported");
+            return new ResponseEntity<>(resource.get(), headers, HttpStatus.OK);
         } else {
-            LOGGER.error("Deal not exported; Error occurred during .xlsx file writing");
+            LOGGER.error("Deal not exported; Error occurred during .xlsx file writing or .zip archive creating");
             return new ResponseEntity<>("Deal exporting was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

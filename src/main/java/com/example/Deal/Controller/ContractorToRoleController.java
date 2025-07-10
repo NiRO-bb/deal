@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 /**
  * Handles incoming http-requests at URL '/contractor-to-role'
  * <p>
@@ -35,14 +37,22 @@ public class ContractorToRoleController {
      * Adds new role to existing deal contractor.
      *
      * @param contractorToRole contains contractor id and new role for him
-     * @return added ContractorToRole instance and OK status or INTERNAL_SERVER_ERROR status if error occurred
+     * @return added ContractorToRole instance and OK status,
+     * BAD_REQUEST status if could not find passed deal contractor or contractor role entities
+     * or INTERNAL_SERVER_ERROR status if error occurred
      */
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ContractorToRole.Key contractorToRole) {
         try {
-            ContractorToRole result = service.add(contractorToRole);
-            LOGGER.info("ContractorToRole added {}", contractorToRole.desc());
-            return new ResponseEntity<>(result, HttpStatus.OK);
+            Optional<ContractorToRole> result = service.add(contractorToRole);
+            if (result.isPresent()) {
+                LOGGER.info("ContractorToRole added {}", contractorToRole.desc());
+                return new ResponseEntity<>(result.get(), HttpStatus.OK);
+            } else {
+                LOGGER.warn("ContractorToRole not added {};m" +
+                        "There is no such DealContractor or/and ContractorRole entity(-ies)", contractorToRole.desc());
+                return new ResponseEntity<>("There is no such DealContractor or/and ContractorRole entity(-ies)", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception exception) {
             LOGGER.error("ContractorToRole not added {}; Error occurred {}",
                     contractorToRole.desc(), exception.getMessage());
