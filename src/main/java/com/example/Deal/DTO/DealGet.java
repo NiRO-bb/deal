@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,20 +23,30 @@ import java.util.UUID;
 public class DealGet {
 
     private UUID id;
+
     private String description;
+
     @JsonProperty("agreement_number")
     private String agreementNumber;
+
     @JsonProperty("agreement_date")
     private LocalDate agreementDate;
+
     @JsonProperty("agreement_start_dt")
     private LocalDate agreementStartDt;
+
     @JsonProperty("availability_date")
     private LocalDate availabilityDate;
+
     private Type type;
+
     private Status status;
-    private List<Sum> sum;
+
+    private List<DealSum> sum;
+
     @JsonProperty("close_dt")
     private LocalDate closeDt;
+
     private List<Contractor> contractors;
 
     public void getDataFromDeal(Deal deal) {
@@ -46,6 +57,25 @@ public class DealGet {
         setAgreementStartDt(LocalDate.from(deal.getAgreementStartDt()));
         setAvailabilityDate(deal.getAvailabilityDate());
         setCloseDt(LocalDate.from(deal.getCloseDt()));
+        setType(deal.getType());
+        setStatus(deal.getStatus());
+        setSum(deal.getSum());
+        setContractors(deal.getContractors());
+    }
+
+    public void setContractors(List<DealContractor> dealContractors) {
+        List<Contractor> contractors = new ArrayList<>();
+        for (DealContractor dc : dealContractors) {
+            contractors.add(new Contractor(
+                    dc.getId(),
+                    dc.getContractorId(),
+                    dc.getName(),
+                    dc.isMain(),
+                    dc.getRolesOnly(),
+                    dc.getInn()
+            ));
+        }
+        this.contractors = contractors;
     }
 
     @Getter
@@ -56,21 +86,18 @@ public class DealGet {
     public static class Contractor {
 
         private UUID id;
+
         @JsonProperty("contractor_id")
         private String contractorId;
+
         private String name;
-        @JsonIgnore
-        private String inn;
+
         private boolean main;
+
         private List<ContractorRole> roles;
 
-        public void getDataFromDealContractor(DealContractor dc) {
-            setId(dc.getId());
-            setContractorId(dc.getContractorId());
-            setName(dc.getName());
-            setInn(dc.getInn());
-            setMain(dc.isMain());
-        }
+        @JsonIgnore
+        private String inn;
     }
 
 }

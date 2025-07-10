@@ -20,7 +20,9 @@ public class Status {
 
     @Id
     private String id;
+
     private String name;
+
     @Column(name = "is_active")
     @JsonIgnore
     private boolean isActive = true;

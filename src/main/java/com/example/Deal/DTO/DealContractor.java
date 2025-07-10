@@ -1,18 +1,24 @@
 package com.example.Deal.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,7 +26,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "deal_contractor")
-public class DealContractor {
+public class DealContractor implements Serializable {
 
     @Id
     private UUID id = UUID.randomUUID();
@@ -58,5 +64,16 @@ public class DealContractor {
     @Column(name = "is_active")
     @JsonIgnore
     private boolean isActive = true;
+
+    @OneToMany(mappedBy = "contractor", fetch = FetchType.LAZY)
+    @JsonManagedReference("contractor_reference")
+    private List<ContractorToRole> roles;
+
+    @JsonIgnore
+    public List<ContractorRole> getRolesOnly() {
+        return roles.stream()
+                .map(ContractorToRole::getRole)
+                .collect(Collectors.toList());
+    }
 
 }

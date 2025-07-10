@@ -1,11 +1,13 @@
 package com.example.Deal.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -100,6 +102,21 @@ public class DealSearch {
 
         @JsonProperty("close_dt_end")
         private LocalDate closeDtEnd;
+
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Sum {
+
+        private BigDecimal value;
+
+        private String currency;
+
+        @JsonIgnore
+        private boolean main = false;
 
     }
 
