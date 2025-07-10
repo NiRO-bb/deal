@@ -2,26 +2,61 @@ package com.example.Deal;
 
 import com.example.Deal.DTO.ContractorRole;
 import com.example.Deal.DTO.DealGet;
-import com.example.Deal.DTO.Sum;
+import com.example.Deal.DTO.DealSum;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Provides method for writing data to .xlsx file
  */
 public class ExcelWriter {
 
+    private ExcelWriter() {
+    }
+
+    /**
+     * Creates .zip archive file with passed file.
+     *
+     * @param file data that must be archived
+     * @return .zip archive file - if successful, Optional.empty() - else
+     */
+    public static Optional<InputStreamResource> archive(File file) {
+        File tmpFile = new File("tmp_" + file.getName());
+
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             FileOutputStream fileOutputStream = new FileOutputStream(tmpFile);
+             ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
+            zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+            byte[] buffer = new byte[1024];
+            int data;
+            while ((data = fileInputStream.read(buffer)) > 0) {
+                zipOutputStream.write(buffer, 0, data);
+            }
+            zipOutputStream.close();
+            InputStreamResource result = new InputStreamResource(new FileInputStream(tmpFile));
+            file.delete();
+            tmpFile.delete();
+            return Optional.of(result);
+        } catch (IOException exception) {
+            return Optional.empty();
+        }
+    }
+
     /**
      * Writes .xlsx file based on passed data.
-     *  
+     *
      * @param deals DealGet instances that must be written
      * @return created file or null - if error occurred
      */
@@ -55,17 +90,17 @@ public class ExcelWriter {
                 row.createCell(cellIndex++).setCellValue(String.valueOf(deal.getId()));
                 row.createCell(cellIndex++).setCellValue(deal.getDescription());
                 row.createCell(cellIndex++).setCellValue(deal.getAgreementNumber());
-                row.createCell(cellIndex++).setCellValue(deal.getAgreementDate());
-                row.createCell(cellIndex++).setCellValue(deal.getAgreementStartDt());
-                row.createCell(cellIndex++).setCellValue(deal.getAvailabilityDate());
+                row.createCell(cellIndex++).setCellValue(deal.getAgreementDate().toString());
+                row.createCell(cellIndex++).setCellValue(deal.getAgreementStartDt().toString());
+                row.createCell(cellIndex++).setCellValue(deal.getAvailabilityDate().toString());
                 row.createCell(cellIndex++).setCellValue(deal.getType().getId());
                 row.createCell(cellIndex++).setCellValue(deal.getStatus().getId());
                 saveIndex = cellIndex;
-                for (Sum sum : deal.getSum()) {
+                for (DealSum sum : deal.getSum()) {
                     cellIndex = saveIndex;
                     row = sheet.createRow(rowIndex++);
-                    row.createCell(cellIndex++).setCellValue(sum.getValue().toString());
-                    row.createCell(cellIndex++).setCellValue(sum.getCurrency());
+                    row.createCell(cellIndex++).setCellValue(sum.getSum().toString());
+                    row.createCell(cellIndex++).setCellValue(sum.getCurrencyId());
                     row.createCell(cellIndex++).setCellValue(sum.isMain());
                 }
                 saveIndex = cellIndex;
@@ -76,7 +111,7 @@ public class ExcelWriter {
                     row.createCell(cellIndex++).setCellValue(contractor.getInn());
                     StringBuilder builder = new StringBuilder();
                     for (ContractorRole role : contractor.getRoles()) {
-                        builder.append(role.getId()).append(", ");
+                        builder.append(role.getCategory()).append(", ");
                     }
                     if (builder.length() > 1) {
                         builder.delete(builder.lastIndexOf(","), builder.length());
