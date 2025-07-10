@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,7 +23,7 @@ public class ContractorToRoleControllerTest {
 
     @Test
     public void testSaveSuccess() {
-        Mockito.when(service.add(any(ContractorToRole.Key.class))).thenReturn(new ContractorToRole());
+        Mockito.when(service.add(any(ContractorToRole.Key.class))).thenReturn(Optional.of(new ContractorToRole()));
         ResponseEntity<?> response = controller.add(new ContractorToRole.Key());
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }

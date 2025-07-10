@@ -1,8 +1,10 @@
 package com.example.Deal;
 
+import com.example.Deal.DTO.ContractorRole;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealContractor;
+import com.example.Deal.Repository.ContractorRoleRepository;
 import com.example.Deal.Repository.ContractorToRoleRepository;
 import com.example.Deal.Repository.DealContractorRepository;
 import com.example.Deal.Repository.DealRepository;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
@@ -30,7 +33,8 @@ public class ControllerToRoleServiceTest {
     @BeforeAll
     public static void setup(@Autowired DealRepository dealRepo,
                              @Autowired DealContractorRepository dealContractorRepo,
-                             @Autowired ContractorToRoleRepository contractorToRoleRepo) {
+                             @Autowired ContractorToRoleRepository contractorToRoleRepo,
+                             @Autowired ContractorRoleRepository contractorRoleRepo) {
         Deal deal = new Deal();
         dealId = deal.getId();
         dealRepo.save(deal);
@@ -44,13 +48,13 @@ public class ControllerToRoleServiceTest {
         dealContractorRepo.save(contractor);
 
         key = contractorToRoleRepo.save(new ContractorToRole(
-                new ContractorToRole.Key(contractorId, "BORROWER"), true)).getKey();
+                new ContractorToRole.Key(contractorId, "BORROWER"), contractor, contractorRoleRepo.findById("BORROWER").get(), true)).getKey();
     }
 
     @Test
     public void testAdd() {
-        ContractorToRole contractorToRole = service.add(new ContractorToRole.Key(contractorId, "BORROWER"));
-        Assertions.assertEquals(contractorId, contractorToRole.getKey().getContractorId());
+        Optional<ContractorToRole> contractorToRole = service.add(new ContractorToRole.Key(contractorId, "BORROWER"));
+        Assertions.assertEquals(contractorId, contractorToRole.get().getKey().getContractorId());
     }
 
     @Test
