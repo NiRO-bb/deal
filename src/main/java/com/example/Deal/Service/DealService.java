@@ -1,18 +1,12 @@
 package com.example.Deal.Service;
 
-import com.example.Deal.DTO.ContractorRole;
-import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.DTO.DealGet;
 import com.example.Deal.DTO.DealSearch;
-import com.example.Deal.DTO.DealSum;
 import com.example.Deal.ExcelWriter;
 import com.example.Deal.Repository.DealRepository;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.Deal.Repository.SpecificationManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,14 +22,11 @@ import java.util.UUID;
  * Provides access to repository-layer
  */
 @Service
+@RequiredArgsConstructor
 public class DealService {
 
     private final DealRepository repository;
-
-    @Autowired
-    public DealService(DealRepository repository) {
-        this.repository = repository;
-    }
+    private final SpecificationManager specificationManager;
 
     /**
      * Save/update passed Deal instance.
@@ -53,14 +44,14 @@ public class DealService {
      * @param dealUpdate Deal id and Status that must be updated
      * @return updated Deal entity or null if could not find Deal entity with passed id
      */
-    public Deal change(Deal.DealStatusUpdate dealUpdate) {
+    public Optional<Deal> change(Deal.DealStatusUpdate dealUpdate) {
         Optional<Deal> optDeal = repository.findById(dealUpdate.getId());
         if (optDeal.isPresent()) {
             Deal deal = optDeal.get();
             deal.setStatusId(dealUpdate.getStatus());
-            return repository.save(deal);
+            return Optional.of(repository.save(deal));
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -90,77 +81,7 @@ public class DealService {
      * @return list of found DealGet instances, can be empty
      */
     public List<DealGet> search(DealSearch search, int page, int size) {
-        Specification<Deal> specification = (deal, query, builder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (search.getDealId() != null) {
-                predicates.add(builder.equal(deal.get("id"), search.getDealId()));
-            }
-            if (search.getDescription() != null) {
-                predicates.add(builder.equal(deal.get("description"), search.getDescription()));
-            }
-            if (search.getAgreementNumber() != null) {
-                predicates.add(builder.like(builder.lower(deal.get("agreementNumber")), format(search.getAgreementNumber())));
-            }
-            if (search.getAgreementDate().getAgreementDateStart() != null) {
-                predicates.add(builder.greaterThanOrEqualTo(deal.get("agreementDate"),
-                        search.getAgreementDate().getAgreementDateStart()));
-            }
-            if (search.getAgreementDate().getAgreementDateEnd() != null) {
-                predicates.add(builder.lessThanOrEqualTo(deal.get("agreementDate"),
-                        search.getAgreementDate().getAgreementDateEnd()));
-            }
-            if (search.getAvailabilityDate().getAvailabilityDateStart() != null) {
-                predicates.add(builder.greaterThanOrEqualTo(deal.get("availabilityDate"),
-                        search.getAvailabilityDate().getAvailabilityDateStart()));
-            }
-            if (search.getAvailabilityDate().getAvailabilityDateEnd() != null) {
-                predicates.add(builder.lessThanOrEqualTo(deal.get("availabilityDate"),
-                        search.getAvailabilityDate().getAvailabilityDateEnd()));
-            }
-            if (search.getType() != null) {
-                predicates.add(deal.get("typeId").in(search.getType()));
-            }
-            if (search.getStatus() != null) {
-                predicates.add(deal.get("statusId").in(search.getStatus()));
-            }
-            if (search.getCloseDt().getCloseDtStart() != null) {
-                predicates.add(builder.greaterThanOrEqualTo(deal.get("closeDt"),
-                        search.getCloseDt().getCloseDtStart()));
-            }
-            if (search.getCloseDt().getCloseDtEnd() != null) {
-                predicates.add(builder.greaterThanOrEqualTo(deal.get("closeDt"),
-                        search.getCloseDt().getCloseDtEnd()));
-            }
-            if (search.getBorrowerSearch() != null) {
-                Join<Deal, DealContractor> joinContractor = deal.join("contractors", JoinType.INNER);
-                Join<DealContractor, ContractorToRole> joinToRole = joinContractor.join("roles", JoinType.INNER);
-                Join<ContractorToRole, ContractorRole> joinRole = joinToRole.join("role", JoinType.INNER);
-                predicates.add(builder.and(
-                        builder.equal(joinRole.get("category"), "BORROWER"),
-                        builder.or(builder.like(builder.lower(joinContractor.get("contractorId")), format(search.getBorrowerSearch())),
-                                builder.like(builder.lower(joinContractor.get("name")), format(search.getBorrowerSearch())),
-                                builder.like(builder.lower(joinContractor.get("inn")), format(search.getBorrowerSearch())))));
-            }
-            if (search.getWarrantySearch() != null) {
-                Join<Deal, DealContractor> joinContractor = deal.join("contractors", JoinType.INNER);
-                Join<DealContractor, ContractorToRole> joinToRole = joinContractor.join("roles", JoinType.INNER);
-                Join<ContractorToRole, ContractorRole> joinRole = joinToRole.join("role", JoinType.INNER);
-                predicates.add(builder.and(
-                        builder.equal(joinRole.get("category"), "WARRANTY"),
-                        builder.or(builder.like(builder.lower(joinContractor.get("contractorId")), format(search.getWarrantySearch())),
-                                builder.like(builder.lower(joinContractor.get("name")), format(search.getWarrantySearch())),
-                                builder.like(builder.lower(joinContractor.get("inn")), format(search.getWarrantySearch())))));
-            }
-            if (search.getSum().getValue() != null) {
-                Join<Deal, DealSum> join = deal.join("sum", JoinType.LEFT);
-                predicates.add(builder.equal(join.get("sum"), search.getSum().getValue()));
-            }
-            if (search.getSum().getCurrency() != null) {
-                Join<Deal, DealSum> join = deal.join("sum", JoinType.LEFT);
-                predicates.add(builder.equal(join.get("currencyId"), search.getSum().getCurrency()));
-            }
-            return predicates.isEmpty() ? null : builder.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<Deal> specification = specificationManager.getSpecificationForDealSearch(search);
         List<Deal> deals = repository.findAll(specification, PageRequest.of(page, size)).getContent();
         List<DealGet> result = new ArrayList<>();
         for (Deal d : deals) {
@@ -186,10 +107,6 @@ public class DealService {
         } else {
             return Optional.empty();
         }
-    }
-
-    private String format(String param) {
-        return param == null ? null : "%" + param.toLowerCase() + "%";
     }
 
 }

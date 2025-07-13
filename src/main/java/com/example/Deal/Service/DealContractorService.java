@@ -2,7 +2,7 @@ package com.example.Deal.Service;
 
 import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.Repository.DealContractorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,14 +12,10 @@ import java.util.UUID;
  * Provides access to repository-layer
  */
 @Service
+@RequiredArgsConstructor
 public class DealContractorService {
 
     private final DealContractorRepository dealContractorRepo;
-
-    @Autowired
-    public DealContractorService(DealContractorRepository dealContractorRepo) {
-        this.dealContractorRepo = dealContractorRepo;
-    }
 
     /**
      * Adds and updates DealContractor entities.
@@ -30,15 +26,15 @@ public class DealContractorService {
      * @param contractor instance that must be saved or updated
      * @return added/updated instance or null - if 'main' condition was violate
      */
-    public DealContractor save(DealContractor contractor) {
+    public Optional<DealContractor> save(DealContractor contractor) {
         if (contractor.isMain()) {
             if (dealContractorRepo.countByDealIdAndMainIsTrue(contractor.getDealId()) == 0) {
-                return dealContractorRepo.save(contractor);
+                return Optional.of(dealContractorRepo.save(contractor));
             } else {
-                return null;
+                return Optional.empty();
             }
         } else {
-            return dealContractorRepo.save(contractor);
+            return Optional.of(dealContractorRepo.save(contractor));
         }
     }
 
@@ -50,14 +46,14 @@ public class DealContractorService {
      * @param id value of 'id' field of 'DealContractor' that must be deleted
      * @return deleted instance - if successful, null - if could not find entity with passed id
      */
-    public DealContractor delete(UUID id) {
+    public Optional<DealContractor> delete(UUID id) {
         Optional<DealContractor> optContractor = dealContractorRepo.findById(id);
         if (optContractor.isPresent()) {
             DealContractor contractor = optContractor.get();
             contractor.setActive(false);
-            return dealContractorRepo.save(contractor);
+            return Optional.of(dealContractorRepo.save(contractor));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

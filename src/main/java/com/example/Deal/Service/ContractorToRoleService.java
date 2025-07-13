@@ -6,7 +6,7 @@ import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.Repository.ContractorRoleRepository;
 import com.example.Deal.Repository.ContractorToRoleRepository;
 import com.example.Deal.Repository.DealContractorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,19 +15,12 @@ import java.util.Optional;
  * Provides access to repository-layer
  */
 @Service
+@RequiredArgsConstructor
 public class ContractorToRoleService {
 
     private final ContractorToRoleRepository repository;
     private final DealContractorRepository dealRepo;
     private final ContractorRoleRepository roleRepo;
-
-    @Autowired
-    public ContractorToRoleService(ContractorToRoleRepository repository,
-                                   DealContractorRepository dealRepo, ContractorRoleRepository roleRepo) {
-        this.repository = repository;
-        this.dealRepo = dealRepo;
-        this.roleRepo = roleRepo;
-    }
 
     /**
      * Adds new role to existing contractor.
@@ -53,14 +46,14 @@ public class ContractorToRoleService {
      * @param contractorToRole contains contractor id and role that must be deleted
      * @return deleted instance or null - if could not find entity with passed id
      */
-    public ContractorToRole delete(ContractorToRole.Key contractorToRole) {
+    public Optional<ContractorToRole> delete(ContractorToRole.Key contractorToRole) {
         Optional<ContractorToRole> optContractorToRole = repository.findById(contractorToRole);
         if (optContractorToRole.isPresent()) {
             ContractorToRole result = optContractorToRole.get();
             result.setActive(false);
-            return repository.save(result);
+            return Optional.of(repository.save(result));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
