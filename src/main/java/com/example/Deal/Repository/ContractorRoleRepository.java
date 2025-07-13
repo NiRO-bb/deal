@@ -1,14 +1,9 @@
 package com.example.Deal.Repository;
 
 import com.example.Deal.DTO.ContractorRole;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ContractorRoleRepository extends CrudRepository<ContractorRole, String> {
-
-    List<ContractorRole> findAllById(String roleId);
-
+public interface ContractorRoleRepository extends JpaRepository<ContractorRole, String> {
 }

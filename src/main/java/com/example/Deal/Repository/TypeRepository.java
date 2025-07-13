@@ -1,9 +1,9 @@
 package com.example.Deal.Repository;
 
 import com.example.Deal.DTO.Type;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TypeRepository extends CrudRepository<Type, String> {
+public interface TypeRepository extends JpaRepository<Type, String> {
 }
