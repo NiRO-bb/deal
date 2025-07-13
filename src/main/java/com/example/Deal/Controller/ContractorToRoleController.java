@@ -2,9 +2,9 @@ package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.Service.ContractorToRoleService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,16 +22,12 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/contractor-to-role")
+@RequiredArgsConstructor
 public class ContractorToRoleController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ContractorToRoleController.class);
 
     private final ContractorToRoleService service;
-
-    @Autowired
-    public ContractorToRoleController(ContractorToRoleService service) {
-        this.service = service;
-    }
 
     /**
      * Adds new role to existing deal contractor.
@@ -44,19 +40,19 @@ public class ContractorToRoleController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ContractorToRole.Key contractorToRole) {
         try {
-            Optional<ContractorToRole> result = service.add(contractorToRole);
-            if (result.isPresent()) {
+            Optional<ContractorToRole> optContractorToRole = service.add(contractorToRole);
+            if (optContractorToRole.isPresent()) {
                 LOGGER.info("ContractorToRole added {}", contractorToRole.desc());
-                return new ResponseEntity<>(result.get(), HttpStatus.OK);
+                return new ResponseEntity<>(optContractorToRole.get(), HttpStatus.OK);
             } else {
-                LOGGER.warn("ContractorToRole not added {};m" +
+                LOGGER.warn("ContractorToRole not added {}; " +
                         "There is no such DealContractor or/and ContractorRole entity(-ies)", contractorToRole.desc());
                 return new ResponseEntity<>("There is no such DealContractor or/and ContractorRole entity(-ies)", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception exception) {
             LOGGER.error("ContractorToRole not added {}; Error occurred {}",
                     contractorToRole.desc(), exception.getMessage());
-            return new ResponseEntity<>("ContractorToRole adding was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("ContractorToRole adding was failed.");
         }
     }
 
@@ -72,8 +68,8 @@ public class ContractorToRoleController {
     @DeleteMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody ContractorToRole.Key contractorToRole) {
         try {
-            ContractorToRole result = service.delete(contractorToRole);
-            if (result != null) {
+            Optional<ContractorToRole> optContractorToRole = service.delete(contractorToRole);
+            if (optContractorToRole.isPresent()) {
                 LOGGER.info("ContractorToRole deleted {}", contractorToRole.desc());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
@@ -83,7 +79,7 @@ public class ContractorToRoleController {
         } catch (Exception exception) {
             LOGGER.error("ContractorToRole not deleted {}; Error occurred {}",
                     contractorToRole.desc(), exception.getMessage());
-            return new ResponseEntity<>("ContractorToRole deleting was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("ContractorToRole deleting was failed.");
         }
     }
 

@@ -2,9 +2,9 @@ package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.Service.DealContractorService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -23,16 +24,12 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/deal-contractor")
+@RequiredArgsConstructor
 public class DealContractorController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DealContractorController.class);
 
     private final DealContractorService service;
-
-    @Autowired
-    public DealContractorController(DealContractorService service) {
-        this.service = service;
-    }
 
     /**
      * Creates and updates 'DealContractor' entities.
@@ -47,10 +44,10 @@ public class DealContractorController {
     @PutMapping("/save")
     public ResponseEntity<?> save(@RequestBody DealContractor contractor) {
         try {
-            DealContractor result = service.save(contractor);
-            if (result != null) {
+            Optional<DealContractor> optContractor = service.save(contractor);
+            if (optContractor.isPresent()) {
                 LOGGER.info("DealContractor added {}", String.format("{ \"id\":\"%s\" }", contractor.getId()));
-                return new ResponseEntity<>(result, HttpStatus.OK);
+                return new ResponseEntity<>(optContractor, HttpStatus.OK);
             } else {
                 LOGGER.warn("DealContractor not added {}; Main contractor already exists", String.format("{ \"id\":\"%s\" }", contractor.getId()));
                 return new ResponseEntity<>("Main contractor of this deal already exists. " +
@@ -59,7 +56,7 @@ public class DealContractorController {
         } catch (Exception exception) {
             LOGGER.error("DealContractor not added {}; Error occurred {}",
                     String.format("{ \"id\":\"%s\" }", contractor.getId()), exception.getMessage());
-            return new ResponseEntity<>("DealContractor saving was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("DealContractor saving was failed.");
         }
     }
 
@@ -76,8 +73,8 @@ public class DealContractorController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         try {
-            DealContractor result = service.delete(id);
-            if (result != null) {
+            Optional<DealContractor> optContractor = service.delete(id);
+            if (optContractor.isPresent()) {
                 LOGGER.info("DealContractor deleted {}", String.format("{ \"id\":\"%s\" }", id));
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } else {
@@ -87,7 +84,7 @@ public class DealContractorController {
         } catch (Exception exception) {
             LOGGER.error("DealContractor not deleted {}; Error occurred {}",
                     String.format("{ \"id\":\"%s\" }", id), exception.getMessage());
-            return new ResponseEntity<>("DealContractor deleting was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("DealContractor deleting was failed.");
         }
     }
 

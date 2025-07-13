@@ -4,9 +4,9 @@ import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealGet;
 import com.example.Deal.DTO.DealSearch;
 import com.example.Deal.Service.DealService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,16 +32,12 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping("/deal")
+@RequiredArgsConstructor
 public class DealController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(DealController.class);
 
     private final DealService service;
-
-    @Autowired
-    public DealController(DealService service) {
-        this.service = service;
-    }
 
     /**
      * Creates and updates 'Deal' entities.
@@ -60,7 +56,7 @@ public class DealController {
         } catch (Exception exception) {
             LOGGER.error("Deal not added {}; Error occurred {}",
                     String.format("{ \"id\":\"%s\" }", deal.getId()), exception.getMessage());
-            return new ResponseEntity<>("Deal adding/updating was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Deal adding/updating was failed.");
         }
     }
 
@@ -77,10 +73,10 @@ public class DealController {
     @PatchMapping("/change/status")
     public ResponseEntity<?> change(@RequestBody Deal.DealStatusUpdate deal) {
         try {
-            Deal result = service.change(deal);
-            if (result != null) {
+            Optional<Deal> optDeal = service.change(deal);
+            if (optDeal.isPresent()) {
                 LOGGER.info("Deal status updated {}", deal.desc());
-                return new ResponseEntity<>(result, HttpStatus.OK);
+                return new ResponseEntity<>(optDeal.get(), HttpStatus.OK);
             } else {
                 LOGGER.warn("Deal status not updated {}; There is no deal entity with such id", deal.desc());
                 return new ResponseEntity<>("There is no deal with such id.", HttpStatus.NOT_FOUND);
@@ -88,7 +84,7 @@ public class DealController {
         } catch (Exception exception) {
             LOGGER.error("Deal status not updated {}; Error occurred {}",
                     deal.desc(), exception.getMessage());
-            return new ResponseEntity<>("Deal status updating was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Deal status updating was failed.");
         }
     }
 
@@ -110,7 +106,7 @@ public class DealController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             LOGGER.info("Deal not obtained {}; There is no deal entity with such id", String.format("{ \"id\":\"%s\" }", id));
-            return new ResponseEntity<>("There is no deal entity with such id", HttpStatus.NOT_FOUND);
+            throw new RuntimeException("There is no deal entity with such id.");
         }
     }
 
@@ -136,7 +132,7 @@ public class DealController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {
             LOGGER.info("Deal list not obtained { \"count\":0 }; Could not find any suitable deal");
-            return new ResponseEntity<>("Could not find any suitable deal", HttpStatus.NO_CONTENT);
+            throw new RuntimeException("Could not find any suitable deal.");
         }
     }
 
@@ -163,7 +159,7 @@ public class DealController {
             return new ResponseEntity<>(resource.get(), headers, HttpStatus.OK);
         } else {
             LOGGER.error("Deal not exported; Error occurred during .xlsx file writing or .zip archive creating");
-            return new ResponseEntity<>("Deal exporting was failed.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Deal exporting was failed.");
         }
     }
 
