@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
@@ -40,14 +41,15 @@ public class DealServiceTest {
 
     @Test
     public void testChangeSuccess() {
-        Deal deal = service.change(new Deal.DealStatusUpdate(dealId, "CLOSED"));
-        Assertions.assertEquals("CLOSED", deal.getStatusId());
+        Optional<Deal> deal = service.change(new Deal.DealStatusUpdate(dealId, "CLOSED"));
+        Assertions.assertEquals("CLOSED", deal.get().getStatusId());
         service.change(new Deal.DealStatusUpdate(dealId, "DRAFT"));
     }
 
     @Test
     public void testChangeNull() {
-        Assertions.assertNull(service.change(new Deal.DealStatusUpdate(UUID.randomUUID(), "test")));
+        Assertions.assertEquals(Optional.empty(),
+                service.change(new Deal.DealStatusUpdate(UUID.randomUUID(), "test")));
     }
 
 }

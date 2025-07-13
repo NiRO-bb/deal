@@ -59,13 +59,13 @@ public class ControllerToRoleServiceTest {
 
     @Test
     public void testDeleteSuccess() {
-        ContractorToRole result = service.delete(key);
-        Assertions.assertFalse(result.isActive());
+        Optional<ContractorToRole> result = service.delete(key);
+        Assertions.assertFalse(result.get().isActive());
     }
 
     @Test
     public void testDeleteFailure() {
-        Assertions.assertNull(service.delete(new ContractorToRole.Key(UUID.randomUUID(), "BORROWER")));
+        Assertions.assertEquals(Optional.empty(), service.delete(new ContractorToRole.Key(UUID.randomUUID(), "BORROWER")));
     }
 
 }

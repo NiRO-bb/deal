@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
@@ -52,8 +53,8 @@ public class DealContractorServiceTest {
         dealContractor.setDealId(dealId);
         dealContractor.setName("name");
         dealContractor.setContractorId("1");
-        DealContractor result = service.save(dealContractor);
-        Assertions.assertEquals(dealId, result.getDealId());
+        Optional<DealContractor> result = service.save(dealContractor);
+        Assertions.assertEquals(dealId, result.get().getDealId());
     }
 
     @Test
@@ -61,18 +62,18 @@ public class DealContractorServiceTest {
         DealContractor dealContractor = new DealContractor();
         dealContractor.setDealId(dealId);
         dealContractor.setMain(true);
-        Assertions.assertNull(service.save(dealContractor));
+        Assertions.assertEquals(Optional.empty(), service.save(dealContractor));
     }
 
     @Test
     public void testDeleteSuccess() {
-        DealContractor result = service.delete(contractorId);
-        Assertions.assertEquals(contractorId, result.getId());
+        Optional<DealContractor> result = service.delete(contractorId);
+        Assertions.assertEquals(contractorId, result.get().getId());
     }
 
     @Test
     public void testDeleteFailure() {
-        Assertions.assertNull(service.delete(UUID.randomUUID()));
+        Assertions.assertEquals(Optional.empty(), service.delete(UUID.randomUUID()));
     }
 
 }

@@ -36,20 +36,19 @@ public class DealControllerTest {
     @Test
     public void testSaveFailure() {
         Mockito.when(service.save(any(Deal.class))).thenThrow(new RuntimeException("error"));
-        ResponseEntity<?> response = controller.save(new Deal());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.save(new Deal()));
     }
 
     @Test
     public void testChangeSuccess() {
-        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(new Deal());
+        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(Optional.of(new Deal()));
         ResponseEntity<?> response = controller.change(new Deal.DealStatusUpdate());
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
-    public void testChangeNull() {
-        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(null);
+    public void testChangeEmpty() {
+        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(Optional.empty());
         ResponseEntity<?> response = controller.change(new Deal.DealStatusUpdate());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -57,8 +56,7 @@ public class DealControllerTest {
     @Test
     public void testChangeFailure() {
         Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenThrow(new RuntimeException("error"));
-        ResponseEntity<?> response = controller.change(new Deal.DealStatusUpdate());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.change(new Deal.DealStatusUpdate()));
     }
 
     @Test
@@ -71,8 +69,7 @@ public class DealControllerTest {
     @Test
     public void testGetFailure() {
         Mockito.when(service.get(any(UUID.class))).thenReturn(Optional.empty());
-        ResponseEntity<?> response = controller.get(Mockito.mock(UUID.class));
-        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.get(Mockito.mock(UUID.class)));
     }
 
     @Test
@@ -87,8 +84,7 @@ public class DealControllerTest {
     public void testSearchFailure() {
         Mockito.when(service.search(any(DealSearch.class), any(Integer.class), any(Integer.class)))
                 .thenReturn(new ArrayList<>());
-        ResponseEntity<?> response = controller.search(new DealSearch(), 0, 0);
-        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.search(new DealSearch(), 0, 0));
     }
 
 }

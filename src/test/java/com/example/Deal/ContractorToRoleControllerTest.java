@@ -31,20 +31,19 @@ public class ContractorToRoleControllerTest {
     @Test
     public void testSaveFailure() {
         Mockito.when(service.add(any(ContractorToRole.Key.class))).thenThrow(new RuntimeException("error"));
-        ResponseEntity<?> response = controller.add(new ContractorToRole.Key());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.add(new ContractorToRole.Key()));
     }
 
     @Test
     public void testDeleteSuccess() {
-        Mockito.when(service.delete(any(ContractorToRole.Key.class))).thenReturn(new ContractorToRole());
+        Mockito.when(service.delete(any(ContractorToRole.Key.class))).thenReturn(Optional.of(new ContractorToRole()));
         ResponseEntity<?> response = controller.delete(new ContractorToRole.Key());
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
-    public void testDeleteNull() {
-        Mockito.when(service.delete(any(ContractorToRole.Key.class))).thenReturn(null);
+    public void testDeleteEmpty() {
+        Mockito.when(service.delete(any(ContractorToRole.Key.class))).thenReturn(Optional.empty());
         ResponseEntity<?> response = controller.delete(new ContractorToRole.Key());
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
@@ -52,8 +51,7 @@ public class ContractorToRoleControllerTest {
     @Test
     public void testDeleteFailure() {
         Mockito.when(service.delete(any(ContractorToRole.Key.class))).thenThrow(new RuntimeException("error"));
-        ResponseEntity<?> response = controller.delete(new ContractorToRole.Key());
-        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        Assertions.assertThrows(RuntimeException.class, () -> controller.delete(new ContractorToRole.Key()));
     }
 
 }
