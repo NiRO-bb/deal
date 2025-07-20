@@ -1,6 +1,5 @@
-package com.example.Deal;
+package com.example.Deal.Controller;
 
-import com.example.Deal.Controller.ContractorToRoleController;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.Service.ContractorToRoleService;
 import org.junit.jupiter.api.Assertions;

@@ -1,6 +1,5 @@
-package com.example.Deal;
+package com.example.Deal.Controller;
 
-import com.example.Deal.Controller.DealContractorController;
 import com.example.Deal.DTO.DealContractor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
