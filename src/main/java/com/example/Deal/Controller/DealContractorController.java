@@ -2,6 +2,11 @@ package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.Service.DealContractorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +28,7 @@ import java.util.UUID;
  * Contains some methods to work with 'DealContractor' entity.
  */
 @RestController
-@RequestMapping("/deal-contractor")
+@RequestMapping("/deal/deal-contractor")
 @RequiredArgsConstructor
 public class DealContractorController {
 
@@ -34,13 +39,23 @@ public class DealContractorController {
     /**
      * Creates and updates 'DealContractor' entities.
      * <p>
-     * Can be called at URL '/deal-contractor/save'
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param contractor instance that must be updated
      * @return OK status and added/updated instance - if successful,
      * BAD_REQUEST status - if could not find DealContractor with passed id,
      * INTERNAL_SERVER_ERROR status - if error occurred
      */
+    @Operation(summary = "Add/update Deal Contractor", description = "Adds and updates Deal Contractor entity")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal Contractor saved",
+                    content = @Content(schema = @Schema(implementation = DealContractor.class))),
+            @ApiResponse(responseCode = "400", description = "Deal Contractor not saved - invalid data",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Deal Contractor saving was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PutMapping("/save")
     public ResponseEntity<?> save(@RequestBody DealContractor contractor) {
         try {
@@ -64,12 +79,22 @@ public class DealContractorController {
      * Logically deletes DealContractor entities.
      * <p>
      * Updates 'is_active' field value to 'false' value.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param id value of 'id' field of 'DealContractor' that must be deleted
      * @return NO_CONTENT status - if successful,
      * NOT_FOUND status - if there is no DealContractor entity with passed key,
      * INTERNAL_SERVER_ERROR - if error occurred
      */
+    @Operation(summary = "Delete Deal Contractor", description = "Logically deletes Deal Contractor entity")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Deal Contractor deleted"),
+            @ApiResponse(responseCode = "404", description = "Deal Contractor not deleted - invalid data",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Deal Contractor deleting was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") UUID id) {
         try {

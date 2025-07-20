@@ -2,6 +2,11 @@ package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.Service.ContractorToRoleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +26,7 @@ import java.util.Optional;
  * Contains some methods to work with 'ContractorToRole' entity.
  */
 @RestController
-@RequestMapping("/contractor-to-role")
+@RequestMapping("/deal/contractor-to-role")
 @RequiredArgsConstructor
 public class ContractorToRoleController {
 
@@ -31,12 +36,23 @@ public class ContractorToRoleController {
 
     /**
      * Adds new role to existing deal contractor.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param contractorToRole contains contractor id and new role for him
      * @return added ContractorToRole instance and OK status,
      * BAD_REQUEST status if could not find passed deal contractor or contractor role entities
      * or INTERNAL_SERVER_ERROR status if error occurred
      */
+    @Operation(summary = "Add role for Deal Contractor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role added",
+                    content = @Content(schema = @Schema(implementation = ContractorToRole.class))),
+            @ApiResponse(responseCode = "400", description = "Role not added",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Role adding was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody ContractorToRole.Key contractorToRole) {
         try {
@@ -60,11 +76,21 @@ public class ContractorToRoleController {
      * Logically deletes role of DealContractor.
      * <p>
      * Updates value of 'is_active' field to 'false'.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param contractorToRole contains contractor id and role that must be deleted
      * @return NO_CONTENT - if successful, BAD_REQUEST - if could not find ContractorToRole instance with passed id,
      * INTERNAL_SERVER_ERROR status if error occurred
      */
+    @Operation(summary = "Delete Deal Contractor role", description = "Logically deletes role of Deal Contractor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Role deleted"),
+            @ApiResponse(responseCode = "400", description = "Role not deleted - invalid data",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Role deleting was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @DeleteMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody ContractorToRole.Key contractorToRole) {
         try {

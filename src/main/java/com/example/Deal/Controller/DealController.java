@@ -4,6 +4,12 @@ import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealGet;
 import com.example.Deal.DTO.DealSearch;
 import com.example.Deal.Service.DealService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +48,19 @@ public class DealController {
     /**
      * Creates and updates 'Deal' entities.
      * <p>
-     * Can be called at url '/deal/save'
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param deal instance that must be saved or updated
      * @return ResponseEntity with result and OK status - if successful, ResponseEntity with INTERNAL_SERVER_ERROR - else
      */
+    @Operation(summary = "Add/update Deal", description = "Adds and updates Deal entity")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal saved",
+                    content = @Content(schema = @Schema(implementation = Deal.class))),
+            @ApiResponse(responseCode = "500", description = "Deal saving was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PutMapping("/save")
     public ResponseEntity<?> save(@RequestBody Deal deal) {
         try {
@@ -63,13 +77,23 @@ public class DealController {
     /**
      * Updates 'Deal' status.
      * <p>
-     * Can be called at url '/deal/change/status'.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      *
      * @param deal contains Deal id (that must be updated) and Status (that must be assigned)
      * @return ResponseEntity with updated result and OK status - if successful,
      * NOT_FOUND status - if could not find Deal with passed id,
      * INTERNAL_SERVER_ERROR status - else
      */
+    @Operation(summary = "Change Deal status", description = "Replaces Deal entity status with passed value")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal status saved",
+                    content = @Content(schema = @Schema(implementation = Deal.class))),
+            @ApiResponse(responseCode = "404", description = "Deal status not saved - invalid data",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Deal status saving was failing",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PatchMapping("/change/status")
     public ResponseEntity<?> change(@RequestBody Deal.DealStatusUpdate deal) {
         try {
@@ -91,29 +115,46 @@ public class DealController {
     /**
      * Provides 'Deal' instance with related data.
      * <p>
-     * Can be called at url '/deal/{id}'.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      * Returns data of Deal entity + Type, Status, Sum, DealContractor data.
      *
      * @param id value of 'id' field of 'Deal' entity that is in the search
      * @return ResponseEntity with founded result and OK status - if successful,
      * NOT_FOUND status - if could not find Deal with passed id
      */
+    @Operation(summary = "Receive Deal", description = "Receives Deal entity by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal received",
+                    content = @Content(schema = @Schema(implementation = DealGet.class))),
+            @ApiResponse(responseCode = "404", description = "Deal not received - invalid data",
+                    content = @Content(schema = @Schema(type = "string", example = "error message"))),
+            @ApiResponse(responseCode = "500", description = "Deal receiving was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") UUID id) {
-        Optional<DealGet> result = service.get(id);
-        if (result.isPresent()) {
-            LOGGER.info("Deal obtained {}", String.format("{ \"id\":\"%s\" }", id));
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            LOGGER.info("Deal not obtained {}; There is no deal entity with such id", String.format("{ \"id\":\"%s\" }", id));
-            throw new RuntimeException("There is no deal entity with such id.");
+        try {
+            Optional<DealGet> result = service.get(id);
+            if (result.isPresent()) {
+                LOGGER.info("Deal obtained {}", String.format("{ \"id\":\"%s\" }", id));
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                LOGGER.warn("Deal not obtained {}; There is no deal entity with such id",
+                        String.format("{ \"id\":\"%s\" }", id));
+                return new ResponseEntity<>("There is no deal entity with such id.", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Deal obtaining was failed; Error occurred {}", exception.getMessage());
+            throw new RuntimeException("Deal obtaining was failed.");
         }
     }
 
     /**
      * Provides list of 'Deal' instances with related data.
      * <p>
-     * Can be called at url '/deal/search'.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      * Filter deals with passed dealSearch.
      * Returns data of Deal entity + Type, Status, Sum, DealContractor data.
      *
@@ -123,23 +164,37 @@ public class DealController {
      * @return ResponseEntity with founded result and OK status - if successful,
      * NO_CONTENT status - if could not find any Deal entities
      */
+    @Operation(summary = "Receive Deals with filtering parameters")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal list received",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = DealGet.class)))),
+            @ApiResponse(responseCode = "204", description = "Deal list not received"),
+            @ApiResponse(responseCode = "500", description = "Deal list receiving was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PostMapping("/search")
     public ResponseEntity<?> search(@RequestBody DealSearch dealSearch,
                                     @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        List<DealGet> result = service.search(dealSearch, page, size);
-        if (!result.isEmpty()) {
-            LOGGER.info("Deal list obtained {}", String.format("{ \"count\":%d }", result.size()));
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } else {
-            LOGGER.info("Deal list not obtained { \"count\":0 }; Could not find any suitable deal");
-            throw new RuntimeException("Could not find any suitable deal.");
+        try {
+            List<DealGet> result = service.search(dealSearch, page, size);
+            if (!result.isEmpty()) {
+                LOGGER.info("Deal list obtained {}", String.format("{ \"count\":%d }", result.size()));
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            } else {
+                LOGGER.warn("Deal list not obtained { \"count\":0 }; Could not find any suitable deal");
+                return new ResponseEntity<>("There is no matched Deal entity.", HttpStatus.NO_CONTENT);
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Deal list obtaining was failed; Error occurred {}", exception.getMessage());
+            throw new RuntimeException("Deal list obtaining was failed.");
         }
     }
 
     /**
      * Provides .zip archive file with filtering DealGet instances.
      * <p>
-     * Can be called at url '/deal/search/export'.
+     * Throw RuntimeException if something goes wrong -
+     * it is assumed that it will be catched by global exception handler.
      * Filter deals with passed dealSearch.
      * Returns data of Deal entity + Type, Status, Sum, DealContractor data.
      * Results presented in Deal.xlsx file inside .zip archive.
@@ -149,18 +204,32 @@ public class DealController {
      * INTERNAL_SERVER_ERROR status - if export failed
      * (could not write .xlsx file, could not create .zip archive)
      */
+    @Operation(summary = "Receive Deals as file with filtering parameters")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Deal list exported",
+                    content = @Content(schema = @Schema(implementation = InputStreamResource.class))),
+            @ApiResponse(responseCode = "500", description = "Deal list exporting was failed",
+                    content = @Content(schema = @Schema(type = "string", example = "error message")))
+    })
     @PostMapping("/search/export")
     public ResponseEntity<?> export(@RequestBody DealSearch dealSearch) {
-        Optional<InputStreamResource> resource = service.export(dealSearch);
-        if (resource.isPresent()) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
-            LOGGER.info("Deal exported");
-            return new ResponseEntity<>(resource.get(), headers, HttpStatus.OK);
-        } else {
-            LOGGER.error("Deal not exported; Error occurred during .xlsx file writing or .zip archive creating");
+        try {
+            Optional<InputStreamResource> resource = service.export(dealSearch);
+            if (resource.isPresent()) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_TYPE, "application/zip");
+                LOGGER.info("Deal exported");
+                return new ResponseEntity<>(resource.get(), headers, HttpStatus.OK);
+            } else {
+                LOGGER.error("Deal not exported; Error occurred during .xlsx file writing or .zip archive creating");
+                return new ResponseEntity<>("Error occurred during .xlsx file writing or .zip archive creating.",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Deal exporting was failed; Error occurred {}", exception.getMessage());
             throw new RuntimeException("Deal exporting was failed.");
         }
+
     }
 
 }
