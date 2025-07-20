@@ -28,16 +28,14 @@ cd target
 Then launch JAR with specified database.
 <b>Below just a pattern!</b>
 You <b>must</b> replace the following:
-* `<jar_name>` with name of JAR file that produced by Maven (actual is `Contractor-0.0.1-SNAPSHOT.jar`)
+* `<jar_name>` with name of JAR file that produced by Maven (actual is `Deal-0.0.1-SNAPSHOT.jar`)
 * `<port>` with your real port
 * `<database>` with name of your real database
 * `<username>` with name of user who has access to specified database
 * `<password>` with password of specified user
+* `<secret>` with secret - cryptographic key used for signing and verifying the token's integrity
 ```shell
-java -jar <jar_name>.jar \
- --spring.datasource.url=jdbc:postgresql://localhost:<port>/<database2> \
-  --spring.datasource.username=<username> \
-   --spring.datasource.password=<password>
+java -jar <jar_name>.jar \ --spring.datasource.url=jdbc:postgresql://localhost:<port>/<database> \ --spring.datasource.username=<username> \ --spring.datasource.password=<password> \ --token.secret.key=<secret>
 ```
 
 ## Contributing
