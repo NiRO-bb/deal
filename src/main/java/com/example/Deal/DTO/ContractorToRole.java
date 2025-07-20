@@ -3,6 +3,7 @@ package com.example.Deal.DTO;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -32,18 +33,21 @@ public class ContractorToRole implements Serializable {
     @JsonUnwrapped
     private Key key;
 
+    @Schema(hidden = true)
     @ManyToOne
     @MapsId("contractorId")
     @JoinColumn(name = "contractor_id")
     @JsonBackReference("contractor_reference")
     private DealContractor contractor;
 
+    @Schema(hidden = true)
     @ManyToOne
     @MapsId("roleId")
     @JoinColumn(name = "role_id")
     @JsonBackReference("role_reference")
     private ContractorRole role;
 
+    @Schema(hidden = true)
     @Column(name = "is_active")
     private boolean isActive = true;
 
