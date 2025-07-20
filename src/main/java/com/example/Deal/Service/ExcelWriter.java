@@ -1,4 +1,4 @@
-package com.example.Deal;
+package com.example.Deal.Service;
 
 import com.example.Deal.DTO.ContractorRole;
 import com.example.Deal.DTO.DealGet;

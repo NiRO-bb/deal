@@ -1,4 +1,4 @@
-package com.example.Deal;
+package com.example.Deal.Exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * Handles RuntimeExceptions from controller classes.
  */
-@RestControllerAdvice("com.example.Deal.Controllers")
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity with error message
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleException(Exception exception) {
+    public ResponseEntity<String> handleException(RuntimeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
