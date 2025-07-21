@@ -21,10 +21,10 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-public class DealControllerTest {
+public class DealControllerImplTest {
 
     private DealService service = Mockito.mock(DealService.class);
-    private DealController controller = new DealController(service);
+    private DealController controller = new DealControllerImpl(service);
 
     @Test
     public void testSaveSuccess() {
@@ -92,7 +92,7 @@ public class DealControllerTest {
         Mockito.when(service.search(any(DealSearch.class), any(Integer.class), any(Integer.class)))
                 .thenReturn(new ArrayList<>());
         ResponseEntity<?> response = controller.search(new DealSearch(), 0, 0);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
