@@ -1,5 +1,6 @@
 package com.example.Deal.Controller.UI;
 
+import com.example.Deal.Utils.RoleAccess;
 import com.example.Deal.Controller.DealController;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealSearch;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -89,7 +86,7 @@ public class DealUIController {
     public ResponseEntity<?> search(@RequestBody DealSearch search,
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size) {
-        if (hasAccess(search)) {
+        if (RoleAccess.hasAccess(search)) {
             return controller.search(search, page, size);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -107,26 +104,6 @@ public class DealUIController {
     @PostMapping("/search/export")
     public ResponseEntity<?> export(@RequestBody DealSearch search) {
         return controller.export(search);
-    }
-
-    /**
-     * Checks if user has access to some method.
-     * Uses data stored in SecurityContextHolder - extracts user authorities.
-     *
-     * @param search contains filtering fields
-     * @return result of check (true - access permitted, false - access denied)
-     */
-    private boolean hasAccess(DealSearch search) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        List<String> roles = auth.getAuthorities().stream().map(Object::toString).toList();
-        if (roles.contains("DEAL_SUPERUSER") || roles.contains("SUPERUSER")) {
-            return true;
-        } else if (roles.contains("CREDIT_USER") && search.getType().equals(Collections.singletonList("CREDIT"))) {
-            return true;
-        } else if (roles.contains("OVERDRAFT_USER") && search.getType().equals(Collections.singletonList("OVERDRAFT"))) {
-            return true;
-        }
-        return false;
     }
 
 }
