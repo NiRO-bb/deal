@@ -1,6 +1,5 @@
-package com.example.Deal;
+package com.example.Deal.Controller;
 
-import com.example.Deal.Controller.ContractorToRoleController;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.Service.ContractorToRoleService;
 import org.junit.jupiter.api.Assertions;
@@ -16,10 +15,10 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-public class ContractorToRoleControllerTest {
+public class ContractorToRoleControllerImplTest {
 
     private ContractorToRoleService service = Mockito.mock(ContractorToRoleService.class);
-    private ContractorToRoleController controller = new ContractorToRoleController(service);
+    private ContractorToRoleController controller = new ContractorToRoleControllerImpl(service);
 
     @Test
     public void testSaveSuccess() {

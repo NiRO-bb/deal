@@ -1,14 +1,13 @@
-package com.example.Deal;
+package com.example.Deal.Service;
 
-import com.example.Deal.DTO.ContractorRole;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealContractor;
+import com.example.Deal.DatabaseSetup;
 import com.example.Deal.Repository.ContractorRoleRepository;
 import com.example.Deal.Repository.ContractorToRoleRepository;
 import com.example.Deal.Repository.DealContractorRepository;
 import com.example.Deal.Repository.DealRepository;
-import com.example.Deal.Service.ContractorToRoleService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

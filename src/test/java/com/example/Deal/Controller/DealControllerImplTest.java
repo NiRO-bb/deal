@@ -1,6 +1,5 @@
-package com.example.Deal;
+package com.example.Deal.Controller;
 
-import com.example.Deal.Controller.DealController;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealGet;
 import com.example.Deal.DTO.DealSearch;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -21,10 +21,10 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-public class DealControllerTest {
+public class DealControllerImplTest {
 
     private DealService service = Mockito.mock(DealService.class);
-    private DealController controller = new DealController(service);
+    private DealController controller = new DealControllerImpl(service);
 
     @Test
     public void testSaveSuccess() {
@@ -67,8 +67,15 @@ public class DealControllerTest {
     }
 
     @Test
-    public void testGetFailure() {
+    public void testGetEmpty() {
         Mockito.when(service.get(any(UUID.class))).thenReturn(Optional.empty());
+        ResponseEntity<?> response = controller.get(Mockito.mock(UUID.class));
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void testGetFailure() {
+        Mockito.when(service.get(any(UUID.class))).thenThrow(new RuntimeException("error"));
         Assertions.assertThrows(RuntimeException.class, () -> controller.get(Mockito.mock(UUID.class)));
     }
 
@@ -81,10 +88,38 @@ public class DealControllerTest {
     }
 
     @Test
-    public void testSearchFailure() {
+    public void testSearchEmpty() {
         Mockito.when(service.search(any(DealSearch.class), any(Integer.class), any(Integer.class)))
                 .thenReturn(new ArrayList<>());
+        ResponseEntity<?> response = controller.search(new DealSearch(), 0, 0);
+        Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    public void testSearchFailure() {
+        Mockito.when(service.search(any(DealSearch.class), any(Integer.class), any(Integer.class)))
+                .thenThrow(new RuntimeException("error"));
         Assertions.assertThrows(RuntimeException.class, () -> controller.search(new DealSearch(), 0, 0));
+    }
+
+    @Test
+    public void testExportSuccess() {
+        Mockito.when(service.export(any(DealSearch.class))).thenReturn(Optional.of(Mockito.mock(InputStreamResource.class)));
+        ResponseEntity<?> response = controller.export(new DealSearch());
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testExportEmpty() {
+        Mockito.when(service.export(any(DealSearch.class))).thenReturn(Optional.empty());
+        ResponseEntity<?> response = controller.export(new DealSearch());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    }
+
+    @Test
+    public void testExportFailure() {
+        Mockito.when(service.export(any(DealSearch.class))).thenThrow(new RuntimeException("error"));
+        Assertions.assertThrows(RuntimeException.class, () -> controller.export(new DealSearch()));
     }
 
 }

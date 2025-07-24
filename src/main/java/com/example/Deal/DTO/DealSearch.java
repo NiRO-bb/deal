@@ -2,6 +2,7 @@ package com.example.Deal.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +24,15 @@ public class DealSearch {
 
     private String description;
 
+    @Schema(name = "agreement_number")
     @JsonProperty("agreement_number")
     private String agreementNumber;
 
+    @Schema(name = "agreement_date")
     @JsonProperty("agreement_date")
     private AgreementDate agreementDate;
 
+    @Schema(name = "availability_date")
     @JsonProperty("availability_date")
     private AvailabilityDate availabilityDate;
 
@@ -36,12 +40,15 @@ public class DealSearch {
 
     private List<String> status;
 
+    @Schema(name = "close_dt")
     @JsonProperty("close_dt")
     private CloseDt closeDt;
 
+    @Schema(name = "borrower_search")
     @JsonProperty("borrower_search")
     private String borrowerSearch;
 
+    @Schema(name = "warranty_search")
     @JsonProperty("warranty_search")
     private String warrantySearch;
 

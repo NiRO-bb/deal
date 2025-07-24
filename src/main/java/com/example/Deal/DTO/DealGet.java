@@ -3,6 +3,7 @@ package com.example.Deal.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Schema(name = "DealGet")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,15 +28,19 @@ public class DealGet {
 
     private String description;
 
+    @Schema(name = "agreement_number")
     @JsonProperty("agreement_number")
     private String agreementNumber;
 
+    @Schema(name = "agreement_date", example = "2025-01-12")
     @JsonProperty("agreement_date")
     private LocalDate agreementDate;
 
+    @Schema(name = "agreement_start_dt", example = "2025-01-10 12:23:05")
     @JsonProperty("agreement_start_dt")
     private LocalDate agreementStartDt;
 
+    @Schema(name = "availability_date", example = "2025-03-17")
     @JsonProperty("availability_date")
     private LocalDate availabilityDate;
 
@@ -44,6 +50,7 @@ public class DealGet {
 
     private List<DealSum> sum;
 
+    @Schema(name = "close_dt", example = "2025-05-11 05:13:01")
     @JsonProperty("close_dt")
     private LocalDate closeDt;
 

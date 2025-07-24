@@ -1,6 +1,5 @@
-package com.example.Deal;
+package com.example.Deal.Controller;
 
-import com.example.Deal.Controller.DealContractorController;
 import com.example.Deal.DTO.DealContractor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,10 +16,10 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
-public class DealContractorControllerTest {
+public class DealContractorControllerImplTest {
 
     private DealContractorService service = Mockito.mock(DealContractorService.class);
-    private DealContractorController controller = new DealContractorController(service);
+    private DealContractorController controller = new DealContractorControllerImpl(service);
 
     @Test
     public void testSaveSuccess() {

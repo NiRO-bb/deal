@@ -1,8 +1,8 @@
-package com.example.Deal;
+package com.example.Deal.Service;
 
 import com.example.Deal.DTO.Deal;
+import com.example.Deal.DatabaseSetup;
 import com.example.Deal.Repository.DealRepository;
-import com.example.Deal.Service.DealService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
