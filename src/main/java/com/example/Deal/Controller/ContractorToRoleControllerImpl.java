@@ -7,9 +7,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,10 +68,10 @@ public class ContractorToRoleControllerImpl implements ContractorToRoleControlle
                         "There is no such DealContractor or/and ContractorRole entity(-ies)", contractorToRole.desc());
                 return new ResponseEntity<>("There is no such DealContractor or/and ContractorRole entity(-ies)", HttpStatus.BAD_REQUEST);
             }
-        } catch (Exception exception) {
-            LOGGER.error("ContractorToRole not added {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("ContractorToRole not added {} - {}",
                     contractorToRole.desc(), exception.getMessage());
-            throw new RuntimeException("ContractorToRole adding was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -104,10 +106,10 @@ public class ContractorToRoleControllerImpl implements ContractorToRoleControlle
                 LOGGER.warn("ContractorToRole not deleted {}; There is no contractor_to_role entity with such key", contractorToRole.desc());
                 return new ResponseEntity<>("There is no contractor_to_role entity with such key.", HttpStatus.BAD_REQUEST);
             }
-        } catch (Exception exception) {
-            LOGGER.error("ContractorToRole not deleted {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("ContractorToRole not deleted {} - {}",
                     contractorToRole.desc(), exception.getMessage());
-            throw new RuntimeException("ContractorToRole deleting was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 

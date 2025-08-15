@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env_prod
+    volumes:
+      - deal_postgres_data:/var/lib/postgresql/data
+    networks:
+      - rabbit-system
+
+  deal:
+    build: .
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - .env_prod
+    networks:
+      - rabbit-system
+
+volumes:
+  deal_postgres_data:
+
+networks:
+  rabbit-system:
+    external: true

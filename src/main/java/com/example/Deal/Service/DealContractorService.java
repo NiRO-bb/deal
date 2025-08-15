@@ -3,7 +3,9 @@ package com.example.Deal.Service;
 import com.example.Deal.DTO.DealContractor;
 import com.example.Deal.Repository.DealContractorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +57,20 @@ public class DealContractorService {
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Updates DealContractor instances by passed contractorId value.
+     * Updates fields 'name' and 'inn' of entities with matched contractorId.
+     *
+     * @return updated entities amount
+     * @param contractorId value of contractorId field
+     * @param name new value of name field
+     * @param inn new value of inn field
+     */
+    @Transactional
+    public int update(String contractorId, String name, String inn) throws DataAccessException {
+        return dealContractorRepo.updateByCustomerId(contractorId, name, inn);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.Deal.UIController;
 
 import com.example.Deal.Controller.ContractorToRoleController;
-import com.example.Deal.DatabaseSetup;
+import com.example.Deal.ContextSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(DatabaseSetup.class)
+@ExtendWith(ContextSetup.class)
 public class ContractorToRoleUIControllerTest {
 
     @Autowired

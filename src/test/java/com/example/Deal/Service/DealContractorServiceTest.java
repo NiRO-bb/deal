@@ -2,7 +2,7 @@ package com.example.Deal.Service;
 
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealContractor;
-import com.example.Deal.DatabaseSetup;
+import com.example.Deal.ContextSetup;
 import com.example.Deal.Repository.DealContractorRepository;
 import com.example.Deal.Repository.DealRepository;
 import org.junit.jupiter.api.Assertions;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
-@ExtendWith(DatabaseSetup.class)
+@ExtendWith(ContextSetup.class)
 public class DealContractorServiceTest {
 
     private static UUID dealId;
