@@ -6,8 +6,7 @@ This project provides interaction methods for <i>deals</i>.
 * Java 21
 * Maven 3.9.9
 * Spring Boot 3.5.3
-* Docker (for testing)
-* <b>PostgreSQL only</b>
+* Docker 
 
 ### Steps to install project
 1. Clone repository
@@ -20,22 +19,37 @@ git clone https://github.com/NiRO-bb/deal.git
 mvn clean package 
 ```
 
+3. Create .env files
+   You must write .env_dev and .env_prod files with following values (you can use .env_template file from root directory):
+* POSTGRES_USER (only for .env_prod - used for PSQL container)
+* POSTGRES_PASSWORD (only for .env_prod - used for PSQL container)
+* POSTGRES_DB (only for .env_prod - used for PSQL container)
+* SPRING_DATASOURCE_URL
+* SPRING_DATASOURCE_USERNAME
+* SPRING_DATASOURCE_PASSWORD
+* TOKEN_SECRET_KEY
+* APP_RABBIT_HOST
+* APP_RABBIT_PORT
+* APP_RABBIT_DLX
+* APP_RABBIT_CONTRACTOR_DLX
+* APP_RABBIT_QUEUE
+* APP_RABBIT_DEAD_QUEUE
+
+<p>.env_dev - for local development </p>
+<p>.env_prod - for container (docker) development</p>
+
 ## Usage
-After project installing go to "target" directory.
+1. Create network
 ```shell
-cd target
+docker network create rabbit-system
 ```
-Then launch JAR with specified database.
-<b>Below just a pattern!</b>
-You <b>must</b> replace the following:
-* `<jar_name>` with name of JAR file that produced by Maven (actual is `Deal-0.0.1-SNAPSHOT.jar`)
-* `<port>` with your real port
-* `<database>` with name of your real database
-* `<username>` with name of user who has access to specified database
-* `<password>` with password of specified user
-* `<secret>` with secret - cryptographic key used for signing and verifying the token's integrity
+2. Launch RabbitMQ
 ```shell
-java -jar <jar_name>.jar \ --spring.datasource.url=jdbc:postgresql://localhost:<port>/<database> \ --spring.datasource.username=<username> \ --spring.datasource.password=<password> \ --token.secret.key=<secret>
+docker run -d --name rabbitmq -p 5672:5672 -p 15672:15672 --network rabbit-system rabbitmq:3-management
+```
+Launch docker
+```shell
+docker-compose up -d
 ```
 
 ## Contributing
