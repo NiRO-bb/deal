@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -69,10 +70,10 @@ public class DealContractorControllerImpl implements DealContractorController {
                 return new ResponseEntity<>("Main contractor of this deal already exists. " +
                         "Change \"main\" value to \"false\".", HttpStatus.BAD_REQUEST);
             }
-        } catch (Exception exception) {
-            LOGGER.error("DealContractor not added {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("DealContractor not added {} - {}",
                     String.format("{ \"id\":\"%s\" }", contractor.getId()), exception.getMessage());
-            throw new RuntimeException("DealContractor saving was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -108,10 +109,10 @@ public class DealContractorControllerImpl implements DealContractorController {
                 LOGGER.warn("DealContractor not deleted {}; DealContractor not found", String.format("{ \"id\":\"%s\" }", id));
                 return new ResponseEntity<>("There is no DealContractor entity with such key.", HttpStatus.NOT_FOUND);
             }
-        } catch (Exception exception) {
-            LOGGER.error("DealContractor not deleted {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("DealContractor not deleted {} - {}",
                     String.format("{ \"id\":\"%s\" }", id), exception.getMessage());
-            throw new RuntimeException("DealContractor deleting was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 

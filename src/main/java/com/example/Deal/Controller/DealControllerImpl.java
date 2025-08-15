@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,10 +69,10 @@ public class DealControllerImpl implements DealController {
             Deal result = service.save(deal);
             LOGGER.info("Deal added {}", String.format("{ \"id\":\"%s\" }", deal.getId()));
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception exception) {
-            LOGGER.error("Deal not added {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("Deal not added {} - {}",
                     String.format("{ \"id\":\"%s\" }", deal.getId()), exception.getMessage());
-            throw new RuntimeException("Deal adding/updating was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -107,10 +108,10 @@ public class DealControllerImpl implements DealController {
                 LOGGER.warn("Deal status not updated {}; There is no deal entity with such id", deal.desc());
                 return new ResponseEntity<>("There is no deal with such id.", HttpStatus.NOT_FOUND);
             }
-        } catch (Exception exception) {
-            LOGGER.error("Deal status not updated {}; Error occurred {}",
+        } catch (DataAccessException exception) {
+            LOGGER.error("Deal status not updated {} - {}",
                     deal.desc(), exception.getMessage());
-            throw new RuntimeException("Deal status updating was failed.");
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -147,9 +148,9 @@ public class DealControllerImpl implements DealController {
                         String.format("{ \"id\":\"%s\" }", id));
                 return new ResponseEntity<>("There is no deal entity with such id.", HttpStatus.NOT_FOUND);
             }
-        } catch (Exception exception) {
-            LOGGER.error("Deal obtaining was failed; Error occurred {}", exception.getMessage());
-            throw new RuntimeException("Deal obtaining was failed.");
+        } catch (DataAccessException exception) {
+            LOGGER.error("Deal obtaining was failed - {}", exception.getMessage());
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -188,9 +189,9 @@ public class DealControllerImpl implements DealController {
                 LOGGER.warn("Deal list not obtained { \"count\":0 }; Could not find any suitable deal");
                 return new ResponseEntity<>("There is no matched Deal entity.", HttpStatus.NO_CONTENT);
             }
-        } catch (Exception exception) {
-            LOGGER.error("Deal list obtaining was failed; Error occurred {}", exception.getMessage());
-            throw new RuntimeException("Deal list obtaining was failed.");
+        } catch (DataAccessException exception) {
+            LOGGER.error("Deal list obtaining was failed - {}", exception.getMessage());
+            throw new DataAccessException(exception.getMessage()) {};
         }
     }
 
@@ -230,9 +231,9 @@ public class DealControllerImpl implements DealController {
                 return new ResponseEntity<>("Error occurred during .xlsx file writing or .zip archive creating.",
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } catch (Exception exception) {
-            LOGGER.error("Deal exporting was failed; Error occurred {}", exception.getMessage());
-            throw new RuntimeException("Deal exporting was failed.");
+        } catch (DataAccessException exception) {
+            LOGGER.error("Deal exporting was failed - {}", exception.getMessage());
+            throw new DataAccessException(exception.getMessage()) {};
         }
 
     }
