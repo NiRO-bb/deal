@@ -7,6 +7,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,7 +18,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DealContractorService {
 
-    private final DealContractorRepository dealContractorRepo;
+    private final DealContractorRepository repository;
+
+    /**
+     * Returns list of all DealContractor entities.
+     * @return
+     */
+    public List<DealContractor> get() {
+        return repository.findAll();
+    }
 
     /**
      * Adds and updates DealContractor entities.
@@ -30,13 +39,13 @@ public class DealContractorService {
      */
     public Optional<DealContractor> save(DealContractor contractor) {
         if (contractor.isMain()) {
-            if (dealContractorRepo.countByDealIdAndMainIsTrue(contractor.getDealId()) == 0) {
-                return Optional.of(dealContractorRepo.save(contractor));
+            if (repository.countByDealIdAndMainIsTrue(contractor.getDealId()) == 0) {
+                return Optional.of(repository.save(contractor));
             } else {
                 return Optional.empty();
             }
         } else {
-            return Optional.of(dealContractorRepo.save(contractor));
+            return Optional.of(repository.save(contractor));
         }
     }
 
@@ -49,11 +58,11 @@ public class DealContractorService {
      * @return deleted instance - if successful, null - if could not find entity with passed id
      */
     public Optional<DealContractor> delete(UUID id) {
-        Optional<DealContractor> optContractor = dealContractorRepo.findById(id);
+        Optional<DealContractor> optContractor = repository.findById(id);
         if (optContractor.isPresent()) {
             DealContractor contractor = optContractor.get();
             contractor.setActive(false);
-            return Optional.of(dealContractorRepo.save(contractor));
+            return Optional.of(repository.save(contractor));
         } else {
             return Optional.empty();
         }
@@ -70,7 +79,7 @@ public class DealContractorService {
      */
     @Transactional
     public int update(String contractorId, String name, String inn) throws DataAccessException {
-        return dealContractorRepo.updateByCustomerId(contractorId, name, inn);
+        return repository.updateByCustomerId(contractorId, name, inn);
     }
 
 }
