@@ -1,27 +1,32 @@
 package com.example.Deal;
 
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import com.redis.testcontainers.RedisContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 
-public class ContextSetup implements BeforeAllCallback {
+public abstract class AbstractContainer  {
 
-    private RabbitMQContainer rabbitContainer = new RabbitMQContainer("rabbitmq:3-management");
+    private static RedisContainer redisContainer;
 
-    private PostgreSQLContainer<?> psqlContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("testDatabase")
-            .withUsername("testUser")
-            .withPassword("testPass");
+    private static RabbitMQContainer rabbitContainer;
 
-    @Override
-    public void beforeAll(ExtensionContext context) {
+    private static PostgreSQLContainer<?> psqlContainer;
+
+    static {
+        redisContainer = new RedisContainer("redis:latest");
+        rabbitContainer = new RabbitMQContainer("rabbitmq:3-management");
+        psqlContainer = new PostgreSQLContainer<>("postgres:latest")
+                .withDatabaseName("testDatabase")
+                .withUsername("testUser")
+                .withPassword("testPass");
+
+        redisContainer.start();
         rabbitContainer.start();
         psqlContainer.start();
         updateProperties();
     }
 
-    private void updateProperties() {
+    private static void updateProperties() {
         System.setProperty("spring.datasource.url", psqlContainer.getJdbcUrl());
         System.setProperty("spring.datasource.username", psqlContainer.getUsername());
         System.setProperty("spring.datasource.password", psqlContainer.getPassword());
@@ -35,6 +40,8 @@ public class ContextSetup implements BeforeAllCallback {
         System.setProperty("app.rabbit.exchange", "test_exchange");
         System.setProperty("app.schedule.fixedDelay", "1000");
         System.setProperty("app.schedule.initialDelay", "1000");
+        System.setProperty("spring.data.redis.host", redisContainer.getHost());
+        System.setProperty("spring.data.redis.port", redisContainer.getMappedPort(6379).toString());
     }
 
 }

@@ -1,9 +1,9 @@
 package com.example.Deal.Service;
 
+import com.example.Deal.AbstractContainer;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealContractor;
-import com.example.Deal.ContextSetup;
 import com.example.Deal.Repository.ContractorRoleRepository;
 import com.example.Deal.Repository.ContractorToRoleRepository;
 import com.example.Deal.Repository.DealContractorRepository;
@@ -11,7 +11,6 @@ import com.example.Deal.Repository.DealRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,8 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
-@ExtendWith(ContextSetup.class)
-public class ControllerToRoleServiceTest {
+public class ControllerToRoleServiceTest extends AbstractContainer {
 
     private static UUID dealId;
     private static UUID contractorId;

@@ -1,12 +1,10 @@
 package com.example.Deal.Service;
 
-import com.example.Deal.ContextSetup;
-import com.example.Deal.DTO.RabbitMessage;
+import com.example.Deal.AbstractContainer;
+import com.example.Deal.DTO.rabbit.RabbitMessage;
 import com.example.Deal.Repository.RabbitMessageRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,8 +12,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @SpringBootTest
-@ExtendWith(ContextSetup.class)
-public class InboxServiceTest {
+public class InboxServiceTest extends AbstractContainer {
 
     @Autowired
     private InboxService service;

@@ -1,9 +1,8 @@
 package com.example.Deal.UIController;
 
+import com.example.Deal.AbstractContainer;
 import com.example.Deal.Controller.DealController;
-import com.example.Deal.ContextSetup;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ExtendWith(ContextSetup.class)
-public class DealUIControllerTest {
+public class DealUIControllerTest extends AbstractContainer {
 
     @Autowired
     private MockMvc mockMvc;
