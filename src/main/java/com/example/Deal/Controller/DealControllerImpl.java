@@ -1,8 +1,9 @@
 package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealGet;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.ChangeStatus;
+import com.example.Deal.DTO.response.DealGet;
+import com.example.Deal.DTO.request.DealSearch;
 import com.example.Deal.Service.DealService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -82,7 +83,7 @@ public class DealControllerImpl implements DealController {
      * Throw RuntimeException if something goes wrong -
      * it is assumed that it will be catched by global exception handler.
      *
-     * @param deal contains Deal id (that must be updated) and Status (that must be assigned)
+     * @param status contains Deal id (that must be updated) and Status (that must be assigned)
      * @return ResponseEntity with updated result and OK status - if successful,
      * NOT_FOUND status - if could not find Deal with passed id,
      * INTERNAL_SERVER_ERROR status - else
@@ -98,19 +99,19 @@ public class DealControllerImpl implements DealController {
     })
     @PatchMapping("/change/status")
     @Override
-    public ResponseEntity<?> change(@RequestBody Deal.DealStatusUpdate deal) {
+    public ResponseEntity<?> change(@RequestBody ChangeStatus status) {
         try {
-            Optional<Deal> optDeal = service.change(deal);
+            Optional<Deal> optDeal = service.change(status);
             if (optDeal.isPresent()) {
-                LOGGER.info("Deal status updated {}", deal.desc());
+                LOGGER.info("Deal status updated {}", status.desc());
                 return new ResponseEntity<>(optDeal.get(), HttpStatus.OK);
             } else {
-                LOGGER.warn("Deal status not updated {}; There is no deal entity with such id", deal.desc());
+                LOGGER.warn("Deal status not updated {}; There is no deal entity with such id", status.desc());
                 return new ResponseEntity<>("There is no deal with such id.", HttpStatus.NOT_FOUND);
             }
         } catch (DataAccessException exception) {
             LOGGER.error("Deal status not updated {} - {}",
-                    deal.desc(), exception.getMessage());
+                    status.desc(), exception.getMessage());
             throw new DataAccessException(exception.getMessage()) {};
         }
     }

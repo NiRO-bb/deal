@@ -1,6 +1,6 @@
 package com.example.Deal.Service;
 
-import com.example.Deal.DTO.RabbitMessage;
+import com.example.Deal.DTO.rabbit.RabbitMessage;
 import com.example.Deal.Repository.RabbitMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

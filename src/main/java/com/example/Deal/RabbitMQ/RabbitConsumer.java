@@ -1,7 +1,7 @@
 package com.example.Deal.RabbitMQ;
 
-import com.example.Deal.DTO.RabbitContractor;
-import com.example.Deal.DTO.RabbitMessage;
+import com.example.Deal.DTO.rabbit.RabbitContractor;
+import com.example.Deal.DTO.rabbit.RabbitMessage;
 import com.example.Deal.Service.DealContractorService;
 import com.example.Deal.Service.InboxService;
 import com.example.Deal.Utils.JsonUtil;

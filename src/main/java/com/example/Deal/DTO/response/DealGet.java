@@ -1,5 +1,11 @@
-package com.example.Deal.DTO;
+package com.example.Deal.DTO.response;
 
+import com.example.Deal.DTO.ContractorRole;
+import com.example.Deal.DTO.Deal;
+import com.example.Deal.DTO.DealContractor;
+import com.example.Deal.DTO.DealSum;
+import com.example.Deal.DTO.Status;
+import com.example.Deal.DTO.Type;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -64,10 +70,6 @@ public class DealGet {
         setAgreementStartDt(LocalDate.from(deal.getAgreementStartDt()));
         setAvailabilityDate(deal.getAvailabilityDate());
         setCloseDt(LocalDate.from(deal.getCloseDt()));
-        setType(deal.getType());
-        setStatus(deal.getStatus());
-        setSum(deal.getSum());
-        setContractors(deal.getContractors());
     }
 
     public void setContractors(List<DealContractor> dealContractors) {

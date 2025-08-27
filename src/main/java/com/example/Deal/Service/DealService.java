@@ -1,8 +1,9 @@
 package com.example.Deal.Service;
 
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealGet;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.ChangeStatus;
+import com.example.Deal.DTO.response.DealGet;
+import com.example.Deal.DTO.request.DealSearch;
 import com.example.Deal.Repository.DealRepository;
 import com.example.Deal.Repository.SpecificationManager;
 import lombok.RequiredArgsConstructor;
@@ -40,14 +41,16 @@ public class DealService {
     /**
      * Update Deal status to passed in args value.
      *
-     * @param dealUpdate Deal id and Status that must be updated
+     * @param status Deal id and Status that must be updated
      * @return updated Deal entity or null if could not find Deal entity with passed id
      */
     public Optional<Deal> change(Deal.DealStatusUpdate dealUpdate) {
         Optional<Deal> optDeal = repository.findById(dealUpdate.getId());
+    public Optional<Deal> change(ChangeStatus status) {
+        Optional<Deal> optDeal = cachedService.get(status.getId());
         if (optDeal.isPresent()) {
             Deal deal = optDeal.get();
-            deal.setStatusId(dealUpdate.getStatus());
+            deal.setStatusId(status.getStatus());
             return Optional.of(repository.save(deal));
         }
         return Optional.empty();

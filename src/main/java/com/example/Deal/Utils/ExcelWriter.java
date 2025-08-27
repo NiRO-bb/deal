@@ -1,7 +1,7 @@
-package com.example.Deal.Service;
+package com.example.Deal.Utils;
 
 import com.example.Deal.DTO.ContractorRole;
-import com.example.Deal.DTO.DealGet;
+import com.example.Deal.DTO.response.DealGet;
 import com.example.Deal.DTO.DealSum;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;

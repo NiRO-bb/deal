@@ -26,8 +26,11 @@ public class ContractorRole implements Serializable {
 
     @Id
     private String id;
+
     private String name;
+
     private String category;
+
     @Column(name = "is_active")
     @JsonIgnore
     private boolean isActive = true;

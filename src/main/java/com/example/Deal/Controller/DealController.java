@@ -1,7 +1,8 @@
 package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.ChangeStatus;
+import com.example.Deal.DTO.request.DealSearch;
 import org.springframework.http.ResponseEntity;
 
 import java.util.UUID;
@@ -22,7 +23,7 @@ public interface DealController {
      * @param deal contains Deal id and new status values
      * @return updated Deal entity
      */
-    ResponseEntity<?> change(Deal.DealStatusUpdate deal);
+    ResponseEntity<?> change(ChangeStatus deal);
 
     /**
      * Retrieves Deal entity by passed id value.

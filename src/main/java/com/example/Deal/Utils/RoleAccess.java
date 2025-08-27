@@ -1,6 +1,6 @@
 package com.example.Deal.Utils;
 
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.DealSearch;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

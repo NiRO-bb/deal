@@ -1,6 +1,6 @@
 package com.example.Deal.Repository;
 
-import com.example.Deal.DTO.RabbitMessage;
+import com.example.Deal.DTO.rabbit.RabbitMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

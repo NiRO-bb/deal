@@ -1,4 +1,4 @@
-package com.example.Deal.DTO;
+package com.example.Deal.DTO.rabbit;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
