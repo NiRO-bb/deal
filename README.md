@@ -21,6 +21,7 @@ mvn clean package
 
 3. Create .env files
    You must write .env_dev and .env_prod files with following values (you can use .env_template file from root directory):
+* SERVER_PORT
 * POSTGRES_USER (only for .env_prod - used for PSQL container)
 * POSTGRES_PASSWORD (only for .env_prod - used for PSQL container)
 * POSTGRES_DB (only for .env_prod - used for PSQL container)
@@ -34,6 +35,8 @@ mvn clean package
 * APP_RABBIT_CONTRACTOR_DLX
 * APP_RABBIT_QUEUE
 * APP_RABBIT_DEAD_QUEUE
+* SPRING_DATA_REDIS_HOST
+* SPRING_DATA_REDIS_PORT
 
 <p>.env_dev - for local development </p>
 <p>.env_prod - for container (docker) development</p>
