@@ -1,13 +1,13 @@
 package com.example.Deal.RabbitMQ;
 
-import com.example.Deal.DTO.RabbitContractor;
+import com.example.Deal.AbstractContainer;
+import com.example.Deal.DTO.rabbit.RabbitContractor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,25 +15,22 @@ import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 @Component
-public class RabbitProducer {
+public class RabbitProducer extends AbstractContainer {
 
     private final ConnectionFactory factory = new ConnectionFactory();
 
-    private final long timeout = 1000;
-
-    @Value("${app.rabbit.exchange}")
     private String exchange;
 
-    @Value("${app.rabbit.queue}")
     private String queue;
 
-    public RabbitProducer(@Value("${app.rabbit.host}") String host,
-                          @Value("${app.rabbit.port}") int port) {
-        factory.setHost(host);
-        factory.setPort(port);
+    public RabbitProducer() {
+        queue = System.getProperty("app.rabbit.queue");
+        exchange = System.getProperty("app.rabbit.exchange");
+        factory.setHost(System.getProperty("app.rabbit.host"));
+        factory.setPort(Integer.parseInt(System.getProperty("app.rabbit.port")));
     }
 
-    public void send(RabbitContractor message) throws IOException, TimeoutException, InterruptedException {
+    public void send(RabbitContractor message) throws IOException, TimeoutException {
         try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             configProducer(channel);

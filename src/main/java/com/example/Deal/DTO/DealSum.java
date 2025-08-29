@@ -45,13 +45,4 @@ public class DealSum {
     @JsonIgnore
     private boolean isActive = true;
 
-//    @Transient
-//    private Currency currency;
-//
-//    public void setCurrency(CurrencyRepository repository) {
-//        Optional<Currency> currency = repository.findById(currencyId);
-//        currency.ifPresent(value -> this.currency = currency.get());
-//    }
-
 }
-

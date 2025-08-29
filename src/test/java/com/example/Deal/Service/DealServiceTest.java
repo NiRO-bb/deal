@@ -1,12 +1,11 @@
 package com.example.Deal.Service;
 
+import com.example.Deal.AbstractContainer;
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.ContextSetup;
+import com.example.Deal.DTO.request.ChangeStatus;
 import com.example.Deal.Repository.DealRepository;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,21 +13,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest
-@ExtendWith(ContextSetup.class)
-public class DealServiceTest {
-
-    private static UUID dealId;
+public class DealServiceTest extends AbstractContainer {
 
     @Autowired
     private DealService service;
 
-    @BeforeAll
-    public static void setup(@Autowired DealRepository repository) {
-        Deal deal = new Deal();
-        dealId = deal.getId();
-        deal.setStatusId("DRAFT");
-        repository.save(deal);
-    }
+    @Autowired
+    private DealRepository repository;
 
     @Test
     public void testSave() {
@@ -41,15 +32,18 @@ public class DealServiceTest {
 
     @Test
     public void testChangeSuccess() {
-        Optional<Deal> deal = service.change(new Deal.DealStatusUpdate(dealId, "CLOSED"));
-        Assertions.assertEquals("CLOSED", deal.get().getStatusId());
-        service.change(new Deal.DealStatusUpdate(dealId, "DRAFT"));
+        Deal deal = new Deal();
+        UUID dealId = deal.getId();
+        deal.setStatusId("DRAFT");
+        repository.save(deal);
+        Optional<Deal> optDeal = service.change(new ChangeStatus(dealId, "CLOSED"));
+        Assertions.assertEquals("CLOSED", optDeal.get().getStatusId());
     }
 
     @Test
     public void testChangeNull() {
         Assertions.assertEquals(Optional.empty(),
-                service.change(new Deal.DealStatusUpdate(UUID.randomUUID(), "test")));
+                service.change(new ChangeStatus(UUID.randomUUID(), "test")));
     }
 
 }

@@ -1,9 +1,10 @@
 package com.example.Deal.Controller.UI;
 
+import com.example.Deal.DTO.request.ChangeStatus;
 import com.example.Deal.Utils.RoleAccess;
 import com.example.Deal.Controller.DealController;
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.DealSearch;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,13 +51,13 @@ public class DealUIController {
      * Updates Deal entity status.
      * Requires DEAL_SUPERUSER role or higher for access.
      *
-     * @param deal contains status and id of Deal entity that must be updated
+     * @param status contains status and id of Deal entity that must be updated
      * @return updated Deal and OK status; NOT_FOUND if there is no matched Deal entity
      */
     @Secured("DEAL_SUPERUSER")
     @PatchMapping("/change/status")
-    public ResponseEntity<?> change(@RequestBody Deal.DealStatusUpdate deal) {
-        return controller.change(deal);
+    public ResponseEntity<?> change(@RequestBody ChangeStatus status) {
+        return controller.change(status);
     }
 
     /**

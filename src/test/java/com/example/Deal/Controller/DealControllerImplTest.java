@@ -1,8 +1,9 @@
 package com.example.Deal.Controller;
 
 import com.example.Deal.DTO.Deal;
-import com.example.Deal.DTO.DealGet;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.ChangeStatus;
+import com.example.Deal.DTO.response.DealGet;
+import com.example.Deal.DTO.request.DealSearch;
 import com.example.Deal.Service.DealService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,22 +42,22 @@ public class DealControllerImplTest {
 
     @Test
     public void testChangeSuccess() {
-        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(Optional.of(new Deal()));
-        ResponseEntity<?> response = controller.change(new Deal.DealStatusUpdate());
+        Mockito.when(service.change(any(ChangeStatus.class))).thenReturn(Optional.of(new Deal()));
+        ResponseEntity<?> response = controller.change(new ChangeStatus());
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     public void testChangeEmpty() {
-        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenReturn(Optional.empty());
-        ResponseEntity<?> response = controller.change(new Deal.DealStatusUpdate());
+        Mockito.when(service.change(any(ChangeStatus.class))).thenReturn(Optional.empty());
+        ResponseEntity<?> response = controller.change(new ChangeStatus());
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     public void testChangeFailure() {
-        Mockito.when(service.change(any(Deal.DealStatusUpdate.class))).thenThrow(new RuntimeException("error"));
-        Assertions.assertThrows(RuntimeException.class, () -> controller.change(new Deal.DealStatusUpdate()));
+        Mockito.when(service.change(any(ChangeStatus.class))).thenThrow(new RuntimeException("error"));
+        Assertions.assertThrows(RuntimeException.class, () -> controller.change(new ChangeStatus()));
     }
 
     @Test

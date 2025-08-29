@@ -1,65 +1,44 @@
 package com.example.Deal.RabbitMQ;
 
-import com.example.Deal.ContextSetup;
-import com.example.Deal.DTO.RabbitContractor;
-import com.example.Deal.Service.DealContractorService;
+import com.example.Deal.AbstractContainer;
+import com.example.Deal.DTO.Deal;
+import com.example.Deal.DTO.DealContractor;
+import com.example.Deal.DTO.rabbit.RabbitContractor;
+import com.example.Deal.Repository.DealContractorRepository;
+import com.example.Deal.Service.DealService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.Date;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.mockito.ArgumentMatchers.anyString;
+import static com.example.Deal.util.TestUtil.getDeal;
+import static com.example.Deal.util.TestUtil.getDealContractor;
+import static com.example.Deal.util.TestUtil.getRabbitContractor;
 
 @SpringBootTest
-@ExtendWith(ContextSetup.class)
-public class RabbitConsumerTest {
+public class RabbitConsumerTest extends AbstractContainer {
 
-    private final int sleepTime = 2;
+    private final int sleepTime = 2000;
 
     @Autowired
     private RabbitProducer producer;
 
-    @MockitoBean
-    private DealContractorService mockService;
+    @Autowired
+    private DealContractorRepository repository;
+
+    @Autowired
+    private DealService service;
 
     @Test
     public void testConsuming() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-        Mockito.when(mockService.update(anyString(), anyString(), anyString()))
-                .thenAnswer(answer -> {
-                    latch.countDown();
-                    return null;
-                });
-        RabbitContractor contractor = getTestContractor();
-        producer.send(contractor);
-        boolean isConsumed = latch.await(sleepTime, TimeUnit.SECONDS);
-        Assertions.assertTrue(isConsumed);
-    }
+        Deal deal = service.save(getDeal());
+        DealContractor contractor = repository.save(getDealContractor(deal.getId()));
+        RabbitContractor rContractor = getRabbitContractor();
 
-    private RabbitContractor getTestContractor() {
-        return new RabbitContractor(
-                "test",
-                null,
-                "test",
-                "test",
-                "test",
-                "test",
-                "test",
-                0,
-                0,
-                new Date(),
-                new Date(),
-                "test",
-                "test",
-                true
-        );
+        producer.send(rContractor);
+        Thread.sleep(sleepTime);
+        String name = repository.findById(contractor.getId()).get().getName();
+        Assertions.assertEquals("new test", name);
     }
 
 }

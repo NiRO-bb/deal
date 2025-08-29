@@ -4,7 +4,7 @@ import com.example.Deal.DTO.ContractorRole;
 import com.example.Deal.DTO.ContractorToRole;
 import com.example.Deal.DTO.Deal;
 import com.example.Deal.DTO.DealContractor;
-import com.example.Deal.DTO.DealSearch;
+import com.example.Deal.DTO.request.DealSearch;
 import com.example.Deal.DTO.DealSum;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
